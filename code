@@ -1,0 +1,188 @@
+# install libraries and then loading them
+# install librarires by pip install pandas
+
+
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn import datasets
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.cluster import Birch
+from numpy import unique
+from numpy import where
+
+# installing the data set
+
+data=pd.read_csv("E:\\cluster truelancer\\1830506-Data-Set-for--Customers-3-converted.csv")
+
+# understanding the data
+
+data.shape
+
+data.describe
+
+data.dtypes
+
+# no null values , data is fully typed
+data.isnull()
+
+# renaming columns
+
+# rename the column
+data.columns.values[3] = "annual_income"
+data.columns.values[4] = "score"
+
+
+#plotting collective boxplot
+sns.boxplot(data=data)
+
+# outlier in annual_income
+
+sns.boxplot(data=data.annual_income)
+
+# anything above 125 annual income needs to be deleted cuz of outlier
+
+data.drop(data[data.annual_income > 125].index, inplace=True)
+
+# again checking for outliers
+
+
+sns.boxplot(data=data.annual_income)
+
+sns.boxplot(data=data)
+
+# we have to convert every column into a numerical one for ease of computation , hence converting gender to numerical
+
+data=pd.get_dummies(data,columns=['Gender'],drop_first=True)
+
+# plotting data
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions ( to visualise the data)
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+# as seen the number of clusters can be greater tham 5 ( mostly 5 or 6)
+
+#  trial 1 , tryong cluster with 5 k means and visualising it
+
+clustering_kmeans = KMeans(n_clusters=5, precompute_distances="auto", n_jobs=-1)
+data['clusters'] = clustering_kmeans.fit_predict(data)
+KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
+    n_clusters=5, n_init=10, n_jobs=None, precompute_distances='auto',
+    random_state=None, tol=0.0001, verbose=0)
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", hue=data['clusters'], data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+
+
+#  trial 2 , tryong cluster with 6 k means and visualising it
+
+clustering_kmeans1 =KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
+    n_clusters=6, n_init=10, n_jobs=None, precompute_distances='auto',
+    random_state=None, tol=0.0001, verbose=0)
+data['clusters1'] = clustering_kmeans1.fit_predict(data)
+
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", hue=data['clusters1'], data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+
+# k means determine k
+distortions = []
+K = range(1,10)
+for k in K:
+    kmeanModel = KMeans(n_clusters=k)
+    kmeanModel.fit(data)
+    distortions.append(kmeanModel.inertia_)
+
+# plotting elbow graph
+
+plt.figure(figsize=(16,8))
+plt.plot(K, distortions, 'bx-')
+plt.xlabel('k')
+plt.ylabel('Distortion')
+plt.title('The Elbow Method showing the optimal k')
+plt.show()
+
+# based on alnow graph , best is to pot k-3
+
+
+#  trial 1 , tryong cluster with 3 k means and visualising it
+
+clustering_kmeans3 = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
+    n_clusters=3, n_init=10, n_jobs=None, precompute_distances='auto',
+    random_state=None, tol=0.0001, verbose=0)
+data['clusters3'] = clustering_kmeans3.fit_predict(data)
+
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", hue=data['clusters3'], data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+# k=3 doesn't  visualise correctly , let's try with lk=7
+
+clustering_kmeans4 = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
+    n_clusters=7, n_init=10, n_jobs=None, precompute_distances='auto',
+    random_state=None, tol=0.0001, verbose=0)
+data['clusters4'] = clustering_kmeans4.fit_predict(data)
+
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", hue=data['clusters4'], data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+# finally after visualising the models , lk=5 appears great
+
+# final modek with k=5
+
+
+#  trial 1 , tryong cluster with 5 k means and visualising it
+
+clustering_kmeans = KMeans(n_clusters=5, precompute_distances="auto", n_jobs=-1)
+data['clusters'] = clustering_kmeans.fit_predict(data)
+KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
+    n_clusters=5, n_init=10, n_jobs=None, precompute_distances='auto',
+    random_state=None, tol=0.0001, verbose=0)
+
+### Run PCA on the data and reduce the dimensions in pca_num_components dimensions
+reduced_data = PCA(n_components=2).fit_transform(data)
+results = pd.DataFrame(reduced_data,columns=['pca1','pca2'])
+
+sns.scatterplot(x="pca1", y="pca2", hue=data['clusters'], data=results)
+plt.title('K-means Clustering with 2 dimensions')
+plt.show()
+
+# finally data set with correct cluster
+
+data = data.drop(['clusters1','clusters3','clusters4'], axis=1)
+
+# Didm't standadise the data , since their's a dummy column in the form of gender , if done will bring the accuracy downwards instead
+
+# didn't check skewness , since the k means algorithm workks on partition on teh basis of centroid distance , which would be same , irrespective of the skewness
+
